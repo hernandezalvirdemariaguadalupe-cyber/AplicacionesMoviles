@@ -107,11 +107,11 @@ las 4 operaciones CRUD y los errores 400/401/404) antes de conectar la app.
 |---|---|---|
 | ![Registro](images/registro.jpeg) | ![Login](images/login.jpeg) | ![Tareas](images/tareas.jpeg) |
 
-| Crear tarea | Editar tarea | Marcar completada |
+| Crear tarea | Editar tarea | Editar tarea |
 |---|---|---|
 | ![Crear tarea](images/creartarea.jpeg) | ![Editar tarea](images/editartarea.jpeg) | ![Editar tarea 2](images/editartarea2.jpeg) |
 
-| Eliminar tarea | Antes de eliminar | Credenciales incorrectas |
+| Eliminar tarea | Después de eliminar | Credenciales incorrectas |
 |---|---|---|
 | ![Eliminar](images/eliminar.jpeg) | ![Eliminar 2](images/eliminar2.jpeg) | ![Credenciales incorrectas](images/cincorrecta.jpeg) |
 
