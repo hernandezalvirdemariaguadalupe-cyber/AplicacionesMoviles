@@ -2,8 +2,8 @@
 
 ## Datos de identificación
 
-- Nombre completo: TODO
-- Número de boleta: TODO
+- Nombre completo: María Guadalupe Hernández Alvirde
+- Número de boleta: 2022630105
 - Grupo: TODO
 
 ## Resumen de la actividad
