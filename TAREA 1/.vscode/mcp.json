@@ -1,0 +1,15 @@
+{
+  "servers": {
+    "filesystem": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "-p", "@modelcontextprotocol/server-filesystem",
+        "-p", "zod@3.25.76",
+        "mcp-server-filesystem",
+        "${workspaceFolder}"
+      ]
+    }
+  }
+}
