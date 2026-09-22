@@ -101,7 +101,27 @@ Pasos:
   contengan la palabra 'MCP' en su contenido."*
   [img/06a-buscar-archivo.png](img/06a-buscar-archivo.png) ·
   [img/06b-buscar-archivo-cont.png](img/06b-buscar-archivo-cont.png)
-- Prueba del límite de seguridad: TODO
+- Prueba del límite de seguridad: [img/07-prueba-limite-seguridad.png](img/07-prueba-limite-seguridad.png)
+  — se pidió leer `..\Practica1\README.md` (fuera de `TAREA 1`, la carpeta permitida) usando explícitamente
+  la herramienta `read_text_file` del servidor MCP `filesystem`. El servidor respondió:
+  ```
+  Access denied - path outside allowed directories:
+  C:\Users\Lupita Alvirde.Lupita_Alvirde\AplicacionesMoviles\Practica1\README.md not in
+  C:\Users\Lupita Alvirde.Lupita_Alvirde\AplicacionesMoviles\TAREA 1
+  ```
+  El mecanismo que impidió la operación es la validación de rutas contra la lista de `allowed directories`
+  que el propio servidor establece al arrancar (y que puede consultarse con su herramienta
+  `list_allowed_directories`), no un filtro del modelo ni del cliente.
+
+  **Nota importante descubierta durante la prueba**: el primer intento de esta prueba, antes de restringir
+  las herramientas disponibles a solo las del servidor MCP, sí logró leer el archivo fuera del directorio
+  permitido — porque el agente usó una herramienta *integrada de Copilot* (con acceso directo al disco, sin
+  relación con MCP) en vez de la herramienta del servidor filesystem. El panel OUTPUT del servidor MCP no
+  registró ninguna petición en ese intento, confirmando que la operación nunca pasó por él. Esto demuestra
+  que el límite de directorios permitidos es una propiedad del **servidor MCP específico**, no una garantía
+  general del cliente ni del modelo: si el agente tiene disponible otra herramienta con más alcance, puede
+  evadir la restricción sin que MCP tenga forma de impedirlo. Ver también
+  [docs/06-seguridad.md](docs/06-seguridad.md).
 
 ## Conclusiones personales
 
