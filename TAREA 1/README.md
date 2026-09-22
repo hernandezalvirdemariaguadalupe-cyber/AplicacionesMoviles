@@ -8,7 +8,18 @@
 
 ## Resumen de la actividad
 
-TODO: resumen breve de qué investiga y qué implementa este repositorio.
+Esta actividad investiga cómo un modelo de lenguaje pasa de estar aislado (solo recibe y
+devuelve texto) a poder operar sobre archivos locales, y qué diferencia concretamente al
+**Model Context Protocol (MCP)** de consumir una API tradicional. La Parte 1 (`docs/`)
+cubre la evolución de los LLM y los modelos con razonamiento, el problema del aislamiento,
+la comparación MCP vs. API, la arquitectura del protocolo, el servidor de referencia de
+sistema de archivos, los riesgos de seguridad y ejemplos de herramientas actuales que
+implementan MCP. La Parte 2 es la implementación real: se instaló y configuró el servidor
+MCP `@modelcontextprotocol/server-filesystem` en **VS Code** (con GitHub Copilot Chat en
+modo Agent), delimitado a la carpeta de este proyecto, y se documentaron con capturas las
+cinco operaciones pedidas (listar, leer, crear, modificar, buscar) más una prueba del
+límite de seguridad que reveló un hallazgo relevante no trivial (ver
+[Evidencias](#evidencias) y [docs/06-seguridad.md](docs/06-seguridad.md)).
 
 ## Índice de la investigación (`docs/`)
 
@@ -22,7 +33,21 @@ TODO: resumen breve de qué investiga y qué implementa este repositorio.
 
 ## Tabla comparativa: MCP vs. API
 
-TODO (ver también [docs/03-mcp-vs-api.md](docs/03-mcp-vs-api.md))
+(Detalle y explicación completa en [docs/03-mcp-vs-api.md](docs/03-mcp-vs-api.md))
+
+| Criterio | API tradicional | MCP |
+|---|---|---|
+| **Quién decide qué se invoca** | La persona desarrolladora, en tiempo de diseño (la llamada al endpoint está escrita de antemano en el código) | El modelo de lenguaje, en tiempo de ejecución, según lo que pida el usuario en lenguaje natural |
+| **Cómo se descubren las capacidades** | Leyendo documentación externa (Swagger/OpenAPI, páginas de docs) antes de programar | El servidor publica su propio catálogo de herramientas (nombre + descripción + esquema de parámetros) y el cliente lo consulta en tiempo real |
+| **Acoplamiento cliente-servicio** | Alto: el código cliente está escrito a la medida de esa API específica | Bajo: el cliente MCP es genérico y se adapta al catálogo que el servidor exponga |
+| **Formato de los mensajes** | Variable según el proveedor (REST+JSON, GraphQL, SOAP, gRPC...) | Estandarizado: siempre JSON-RPC 2.0 |
+| **Autenticación y consentimiento** | Vía API key/token gestionado por el desarrollador, sin aprobación del usuario final por llamada | Pensado para pedir consentimiento explícito del usuario antes de ejecutar cada herramienta |
+| **Reutilización entre aplicaciones distintas** | Baja: la integración se programa a la medida de cada aplicación | Alta: el mismo servidor MCP puede conectarse sin cambios a distintos clientes (VS Code, Claude Desktop, Cursor, etc.) |
+
+**Importante**: MCP no sustituye a las APIs. Un servidor MCP casi siempre envuelve una API o
+un recurso ya existente (el servidor `filesystem` que usamos internamente sigue usando las
+llamadas normales del sistema operativo); lo que agrega MCP es una forma estandarizada de
+anunciar esas capacidades a un modelo y dejar que decida cuándo usarlas.
 
 ## Cliente elegido y justificación
 
@@ -129,4 +154,23 @@ TODO
 
 ## Referencias (formato APA)
 
-TODO (incluir la versión de la especificación MCP consultada)
+- Anthropic. (2024, 25 de noviembre). *Introducing the Model Context Protocol*.
+  https://www.anthropic.com/news/model-context-protocol
+- Cursor. (2026). *Model Context Protocol (MCP)*. https://cursor.com/docs/mcp
+- Google. (2026). *MCP | Google Antigravity Docs*. https://antigravity.google/docs/mcp/
+- Microsoft. (2026). *Add and manage MCP servers in VS Code*.
+  https://code.visualstudio.com/docs/agent-customization/mcp-servers
+- Model Context Protocol. (2026). *Specification (2026-07-28)* [versión de la
+  especificación consultada para esta actividad].
+  https://modelcontextprotocol.io/specification/2026-07-28
+- Model Context Protocol. (2026). *Architecture*.
+  https://modelcontextprotocol.io/specification/2026-07-28/architecture
+- Model Context Protocol. (2026). *Roots (deprecated)*.
+  https://modelcontextprotocol.io/specification/2026-07-28/client/roots
+- Model Context Protocol. (2026). *Transports*.
+  https://modelcontextprotocol.io/specification/2026-07-28/basic/transports
+- Model Context Protocol. (s. f.). *Servers* [repositorio]. GitHub.
+  https://github.com/modelcontextprotocol/servers
+- Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, Ł.,
+  & Polosukhin, I. (2017). *Attention is all you need*. Advances in Neural Information
+  Processing Systems, 30. https://arxiv.org/abs/1706.03762
