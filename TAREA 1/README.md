@@ -85,11 +85,22 @@ Pasos:
 ## Evidencias
 
 - Servidor detectado y herramientas descubiertas: [img/01-servidor-conectado-14-tools.png](img/01-servidor-conectado-14-tools.png)
-- Listar directorio: TODO
-- Leer archivo: TODO
-- Crear archivo: TODO
-- Modificar archivo: TODO
-- Buscar archivo: TODO
+- Listar directorio (`list_directory`): prompt *"Lista el contenido del directorio raíz de este proyecto."*
+  [img/02a-listar-directorio.png](img/02a-listar-directorio.png) ·
+  [img/02b-listar-subdirectorios.png](img/02b-listar-subdirectorios.png) ·
+  [img/02c-listar-subdirectorios-cont.png](img/02c-listar-subdirectorios-cont.png)
+- Leer archivo existente (`read_text_file`): prompt *"Lee el archivo README.md y dime qué secciones tiene."*
+  [img/03-leer-archivo.png](img/03-leer-archivo.png)
+- Crear archivo nuevo y escribir contenido (`write_file`): prompt *"Crea un archivo nuevo llamado
+  demo-mcp.txt en la raíz del proyecto con este contenido exacto: ..."*
+  [img/04-crear-archivo.png](img/04-crear-archivo.png)
+- Modificar archivo existente (`edit_file`): prompt *"Al archivo demo-mcp.txt agrégale una segunda línea
+  que diga: ..."*
+  [img/05-modificar-archivo.png](img/05-modificar-archivo.png)
+- Buscar archivo por contenido (`search_files`): prompt *"Busca en este proyecto todos los archivos que
+  contengan la palabra 'MCP' en su contenido."*
+  [img/06a-buscar-archivo.png](img/06a-buscar-archivo.png) ·
+  [img/06b-buscar-archivo-cont.png](img/06b-buscar-archivo-cont.png)
 - Prueba del límite de seguridad: TODO
 
 ## Conclusiones personales

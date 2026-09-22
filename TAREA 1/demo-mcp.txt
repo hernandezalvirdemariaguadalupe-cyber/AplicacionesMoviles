@@ -1,0 +1,2 @@
+Este archivo fue creado por el servidor MCP de filesystem como demostración de la operación de escritura.
+Esta línea se agregó para verificar la modificación de archivos.
