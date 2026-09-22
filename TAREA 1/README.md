@@ -4,7 +4,7 @@
 
 - Nombre completo: María Guadalupe Hernández Alvirde
 - Número de boleta: 2022630105
-- Grupo: TODO
+- Grupo: 7CV4
 
 ## Resumen de la actividad
 
@@ -150,7 +150,25 @@ Pasos:
 
 ## Conclusiones personales
 
-TODO
+La parte que más me sorprendió de cómo funciona MCP es la parte de seguridad: se
+restringe solo a la carpeta que estás utilizando, y creo que de cierta manera es bueno, ya
+que si lo vemos a nivel empresarial, en un equipo donde varias personas ocupan el mismo
+proyecto en diversos turnos, de cierta manera se protege la edición de archivos al
+ejecutar estos agentes.
+
+Lo distinto de solo copiar y pegar en un chat es que realmente debes razonar qué es lo que
+le estás pidiendo al chat, y debes ser muy claro y específico, ya que si no, el chat no te
+entiende o ejecuta lo que él interpreta.
+
+Regresando al hallazgo de seguridad, es importante mencionar que si no está bien
+configurado, sí accede a todos los archivos de tu computadora. Esto me llevó a pensar que
+ciertamente llegamos a confiar mucho en este tipo de chats o agentes inteligentes sin
+ponernos a pensar a qué grado exponemos información delicada a este tipo de herramientas.
+
+Lo que haría diferente sería, primero, investigar configuraciones adecuadas y prompts
+específicos para ayudarme de este chat. Y lo que ahora haré diferente será primero
+investigar bien todo el contexto de lo que esté haciendo, y no guiarme en un 80% por lo
+que hacen los agentes.
 
 ## Referencias (formato APA)
 
