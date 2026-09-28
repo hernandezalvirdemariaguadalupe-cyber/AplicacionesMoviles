@@ -1,16 +1,52 @@
-## Responsable del equipo utilizado
+<div align="center">
 
-Nombre: Maria Guadalupe Hernandez Alvirde
-Boleta: 2022630105
-Equipo: DELL Latitude 7480
-Procesador: Intel(R) Core(TM) i7-6600U CPU @ 2.60GHz (2.80 GHz)
-RAM	(GB)
-Almacenamiento: 203 GB de 477 GB usado
-Justificación: Al analizar ambos equipos se opto por esta laptop ya que tiene una mejor combinación de RAM, CPU y espacio libre del equipo; soporta virtualización (VT-x/AMD-V habilitada y KVM funcional en WSL)
+# INSTITUTO POLITÉCNICO NACIONAL
+### ESCUELA SUPERIOR DE CÓMPUTO
 
+<br/>
 
+## **Desarrollo de Aplicaciones Móviles Nativas**
+### **Práctica 3: Aplicaciones Nativas**
 
-## Registro de sesiones
+---
+
+**Profesor:** M. en C. Gabriel Hurtado Avilés  
+**Grupo:** 7CV4 &nbsp;|&nbsp; **Ciclo Escolar:** 2027-1  
+**Semestre:** 2027-1  
+
+---
+
+### **Integrantes del Equipo**
+
+| Nombre Completo | Boleta |
+| :--- | :---: |
+| **Hernández Alvirde María Guadalupe** | 2022630105 |
+| **Aragón Martínez Manuel Alejandro** | [Número de Boleta] |
+
+<br/>
+
+**Ciudad de México, Septiembre de 2026**
+
+---
+
+</div>
+
+<br/>
+
+## 📋 Responsable del equipo utilizado
+
+- **Nombre:** Maria Guadalupe Hernandez Alvirde  
+- **Boleta:** 2022630105  
+- **Equipo:** DELL Latitude 7480  
+- **Procesador:** Intel(R) Core(TM) i7-6600U CPU @ 2.60GHz (2.80 GHz, 2 núcleos, 4 hilos)  
+- **RAM:** 16.0 GB (15.9 GB utilizable, 2133 MHz)  
+- **Almacenamiento:** 477 GB SSD (203 GB usados, ~274 GB libres)  
+- **Gráficos:** Intel(R) HD Graphics 520 (128 MB)  
+- **Justificación:** Al analizar las especificaciones de los equipos disponibles, se seleccionó esta laptop debido a que cuenta con 16 GB de memoria RAM, procesador Core i7 con virtualización Intel VT-x activa y más de 270 GB de almacenamiento libre. Esto permite asignar holgadamente 8 GB de RAM al contenedor de macOS y soportar el peso de Xcode y los simuladores sin saturar el sistema operativo anfitrión.
+
+---
+
+## 🗓️ Registro de sesiones de trabajo colaborativo
 
 | # | Fecha | Inicio | Término | Modalidad | Integrantes presentes | Actividades realizadas | Evidencia |
 |---|---|---|---|---|---|---|---|
