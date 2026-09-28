@@ -1,0 +1,38 @@
+# Flutter & Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+ephemeral/
+
+# IDE & Editor files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Android build & secrets
+.gradle/
+**/local.properties
+**/android/app/debug
+**/android/app/profile
+**/android/app/release
+**/*.apk
+**/*.aab
+
+# iOS & macOS build
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Pods/
+**/ios/.symlinks/
+**/*.moved-aside
+**/*.xccheckout
+**/*.xcscmblueprint
+
+# OS generated
+.DS_Store
+Thumbs.db

@@ -206,3 +206,79 @@ Al entrar al menú de macOS Recovery, se abrió la **Utilidad de Discos (Disk Ut
 Con el disco formateado y listo, se inició el asistente de instalación de **macOS Ventura**, seleccionando la unidad `MacOs` como disco de destino y comenzando la descarga e instalación de los archivos del sistema base.
 
 ![Instalador de macOS Ventura en ejecución mostrando el disco de destino y tiempo estimado](capturas/MAC4.png)
+
+---
+
+# Ejercicio 4: Desarrollo Multiplataforma con Flutter
+
+## 4.1 Opción seleccionada: Gestor de Archivos (Opción A)
+Se seleccionó la **Opción A: Gestor de Archivos**, permitiendo cumplir con las funcionalidades del Ejercicio 2 de manera unificada y multiplataforma tanto para **Android** como para **iOS**, dejando la Opción B (Cámara y Micrófono) asignada para el desarrollo en Kotlin Multiplatform (Ejercicio 5).
+
+---
+
+## 4.2 Arquitectura del software (Clean Architecture)
+El proyecto se organizó bajo los principios de **Clean Architecture** y principios de diseño **Material Design 3**, dividiendo las responsabilidades en capas estrictamente delimitadas:
+
+- **Capa Core (`core/`):**
+  - `app_colors.dart`: Paletas institucionales oficiales de Guinda IPN (`#6C1D45`) y Azul ESCOM (`#003366`).
+  - `theme_provider.dart`: Gestión de estado de temas, sincronización de brillo claro/oscuro y persistencia de preferencias.
+- **Capa de Datos (`data/`):**
+  - `file_item.dart`: Entidad del dominio que modela archivos y carpetas con formateo de tamaños (B, KB, MB, GB), fechas legibles y detección de tipos MIME.
+  - `file_repository.dart`: Capa de abstracción del sistema de archivos local (`dart:io` y `path_provider`), proveyendo operaciones atómicas de lectura, escritura, creación y borrado en el sandbox de la aplicación.
+- **Capa de Presentación (`presentation/`):**
+  - **Gestor de estado (`providers/file_manager_provider.dart`):** Implementado con `ChangeNotifier` bajo el patrón **Provider**, gestionando navegación jerárquica, filtros de búsqueda, ordenamiento (nombre, fecha, tamaño) y lista de favoritos.
+  - **Vistas principales (`screens/`):**
+    - `home_screen.dart`: Explorador interactivo con barra de búsqueda, ordenamiento, refresco y botón de creación.
+    - `text_viewer_screen.dart`: Visor y editor en tiempo real de archivos `.txt`, `.md` y `.json` con tipografía monoespaciada.
+    - `image_viewer_screen.dart`: Visor interactivo con soporte de gestos táctiles de pinza (`InteractiveViewer` con zoom hasta 5x) y rotación a 90°.
+    - `settings_screen.dart`: Selector visual de temas institucionales (Guinda IPN vs. Azul ESCOM) y modo de pantalla (Claro, Oscuro, Sistema).
+  - **Componentes (`widgets/`):** Barra interactiva de migas de pan (`BreadcrumbBar`), tarjetas de archivos con menú contextual (`FileListTile`) y diálogo de creación rápida (`CreateItemDialog`).
+
+---
+
+## 4.3 Temas Institucionales y Accesibilidad
+La interfaz respeta la identidad gráfica institucional del IPN y de la ESCOM:
+- **Tema Guinda (IPN):** Primario `#6C1D45` (Pantone 222 C), secundario `#D4AF37` (Oro).
+- **Tema Azul (ESCOM):** Primario `#003366` (Pantone 295 C), secundario `#0099FF` (Azul Celeste).
+- **Modos de iluminación:** Adaptación completa a Modo Claro, Modo Oscuro y automático según la configuración del sistema operativo.
+- **Persistencia:** Almacenamiento de preferencias con `SharedPreferences`.
+
+---
+
+## 4.4 Almacenamiento local y funcionamiento offline
+La aplicación opera **100% sin conexión a Internet**. Trabaja exclusivamente dentro del sandbox local seguro asignado por el sistema operativo (`getApplicationDocumentsDirectory()`). 
+
+Al iniciarse por primera vez, el sistema genera de forma automática un conjunto de archivos institucionales de muestra (`Bienvenida_ESCOM.md`, `notas_practica3.txt`, carpetas de prueba y archivos JSON de configuración) para que el usuario pueda explorar, editar, buscar y comprobar el funcionamiento de las operaciones CRUD de inmediato.
+
+---
+
+## 4.5 Evidencias de ejecución y capturas de pantalla
+
+### A) Pruebas en Android (Emulador Android Studio)
+*Las capturas se obtienen ejecutando la app en el emulador de Android (ej. Pixel 7 / Android 14):*
+
+| Evidencia requerida | Archivo de imagen esperado |
+|---|---|
+| Explorador de archivos con Tema Guinda (IPN) | `capturas/01_flutter_android_guinda.png` |
+| Explorador de archivos con Tema Azul (ESCOM) | `capturas/02_flutter_android_azul.png` |
+| Explorador en Modo Oscuro | `capturas/03_flutter_android_oscuro.png` |
+| Visor y editor de archivo de texto (.txt / .md) | `capturas/04_flutter_android_editor.png` |
+| Visor interactivo de imágenes con zoom por pinza | `capturas/05_flutter_android_imagen.png` |
+| Diálogo de creación de nuevas carpetas y archivos | `capturas/06_flutter_android_crear.png` |
+
+![Explorador en Android con Tema Guinda](capturas/01_flutter_android_guinda.png)
+![Explorador en Android con Tema Azul](capturas/02_flutter_android_azul.png)
+![Visor y editor de texto en Android](capturas/04_flutter_android_editor.png)
+
+---
+
+### B) Pruebas en iOS (Simulador de iPhone en Xcode / macOS)
+*Las capturas se obtienen ejecutando la app en el simulador de iOS dentro de macOS:*
+
+| Evidencia requerida | Archivo de imagen esperado |
+|---|---|
+| Explorador de archivos en simulador de iPhone | `capturas/07_flutter_ios_simulador.png` |
+| Visor de archivos en simulador de iPhone | `capturas/08_flutter_ios_visor.png` |
+
+![Simulador de iPhone ejecutando la app de Flutter](capturas/07_flutter_ios_simulador.png)
+
