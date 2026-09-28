@@ -50,9 +50,11 @@
 
 | # | Fecha | Inicio | Término | Modalidad | Integrantes presentes | Actividades realizadas | Evidencia |
 |---|---|---|---|---|---|---|---|
-| 1 | 27/09/2026 | hh:mm | hh:mm | Remota (videollamada con pantalla compartida) | Hernandez Alvirde Maria Guadalupe, Aragón Martínez Manuel Alejandro | Elección de la PC; clonado de MacOS-Docker; instalación de WSL 2 + Ubuntu; configuración de .wslconfig; verificación de KVM; arranque de macOS por VNC (WSLg no mostraba ventanas); formateo del disco e inicio de la instalación de macOS Ventura | Capturas 01–10 |
-| 2 | 27/09/2026 | hh:mm | hh:mm | Remota | | Fin de instalación de macOS; instalación de Xcode 15.2, Homebrew y CocoaPods; proyecto de prueba en simulador | |
-| 3 | 28/09/2026 | hh:mm | hh:mm | Presencial| | | |
+| 1 | 27/09/2026 | 18:00 | 21:00 | Remota (videollamada con pantalla compartida) | Hernandez Alvirde Maria Guadalupe, Aragón Martínez Manuel Alejandro | Comparativa y elección de la PC; clonado de MacOS-Docker; instalación y verificación de WSL 2 con Ubuntu; configuración de `.wslconfig` (virtualización anidada); verificación de aceleración KVM (`kvm-ok`); solución gráfica vía servidor VNC (TigerVNC en puerto 5999 tras falla de renderizado en WSLg); arranque de macOS Recovery, particionado APFS en Disk Utility e inicio de instalación de macOS Ventura. | Capturas 01–17 en carpeta `capturas/` |
+| 2 | 28/09/2026 | hh:mm | hh:mm | Remota / Presencial | Hernandez Alvirde Maria Guadalupe, Aragón Martínez Manuel Alejandro | Finalización de instalación de macOS Ventura; configuración inicial del sistema; instalación de Xcode, Homebrew y CocoaPods; ejecución de proyecto Swift de prueba en simulador de iPhone. | Por documentar |
+| 3 | 28/09/2026 | hh:mm | hh:mm | Presencial / Remota | Hernandez Alvirde Maria Guadalupe, Aragón Martínez Manuel Alejandro | Desarrollo y pruebas de aplicaciones nativas y multiplataforma (SwiftUI, Flutter, Kotlin Multiplatform). | Por documentar |
+
+---
 
 # Ejercicio 1: Instalación de macOS en la mejor PC del equipo
 
