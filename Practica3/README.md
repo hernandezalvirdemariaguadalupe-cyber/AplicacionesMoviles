@@ -114,27 +114,95 @@ En la interfaz gráfica de Docker Desktop, se accedió a la sección **Settings 
 
 Durante el proceso se verificaron los registros IPC del backend para confirmar la estabilidad de la comunicación entre Docker Desktop y la distribución Ubuntu.
 
-### Paso 6. Problema con WSLg y solución por VNC
-WSLg creaba la ventana (aparecía el ícono en la barra de tareas) pero no la mostraba. Se modificó el arranque para exponer la pantalla por VNC en el puerto 5999 y se usó TigerVNC Viewer.
+![Configuración de integración WSL en Docker Desktop](capturas/Dockerwsl.png)
+![Diagnóstico e integración del servicio Docker Desktop con Ubuntu](capturas/confirmacionubuntudocker.png)
 
+---
 
-### Paso 7. Ejecutar el contenedor
-Se usó el comando del README, con `--name macos`, `-p 5999:5999` y `-e EXTRA="-display none -vnc 0.0.0.0:99,password=off"`.
+### Paso 4. Configurar virtualización anidada (.wslconfig)
+Para permitir que la máquina virtual de macOS dentro del contenedor Docker aproveche la virtualización por hardware, se configuró el archivo `.wslconfig` en la raíz del usuario de Windows (`/mnt/c/Users/Lupita Alvirde.Lupita_Alvirde/.wslconfig`) editándolo con `nano` desde Ubuntu con los siguientes parámetros:
 
-![Comando docker run]()
+```ini
+[wsl2]
+nestedVirtualization=true
+memory=12GB
+processors=8
+```
 
-### Paso 8. Conexión por VNC y arranque de macOS Recovery
-![Arranque en modo verbose]()
-![Logo de Apple cargando]()
+Posteriormente se verificó la correcta sintaxis del archivo con `cat` y se aplicaron los cambios reiniciando el servicio con `wsl --shutdown`.
 
-### Paso 9. Formatear el disco
-Disk Utility > QEMU HARDDISK > Erase: nombre `MacOs`, APFS, GUID Partition Map.
+![Edición de archivo .wslconfig mediante nano](capturas/ubuntu2.png)
+![Comprobación del contenido guardado en .wslconfig con comando cat](capturas/wslconfig.png)
 
-![Disk Utility]()
+---
 
-### Paso 10. Instalar macOS Ventura
+### Paso 5. Verificar aceleración por hardware KVM
+Se accedió a la terminal de Ubuntu y se instaló el paquete de diagnóstico de CPU:
 
-![Progreso de instalación]()
+```bash
+sudo apt update && sudo apt -y install cpu-checker kvm-ok
+kvm-ok
+```
 
+La salida confirmó la disponibilidad del dispositivo `/dev/kvm`:
+```text
+INFO: /dev/kvm exists
+KVM acceleration can be used
+```
 
+![Instalación de paquetes de diagnóstico cpu-checker](capturas/KVM1.png)
+![Confirmación de aceleración KVM habilitada (kvm-ok)](capturas/KVM2.png)
 
+---
+
+### Paso 6. Problema con WSLg y solución mediante servidor VNC
+Durante las pruebas iniciales con WSLg, la ventana de la máquina virtual no se renderizaba correctamente (únicamente aparecía el ícono minimizado en la barra de tareas pero sin desplegar la interfaz gráfica).  
+Para solucionarlo, se modificó el comando de arranque agregando la variable `EXTRA` para desactivar la visualización estándar y levantar un servidor VNC en el puerto 5999 (`-vnc 0.0.0.0:99,password=off`), permitiendo la conexión mediante el cliente **TigerVNC Viewer** en `localhost:5999`.
+
+![Conexión al servidor VNC en localhost:5999 mediante TigerVNC Viewer](capturas/tigervnc2.png)
+
+---
+
+### Paso 7. Ejecutar el contenedor de macOS
+Se ejecutó el contenedor con soporte de aceleración KVM, mapeo de puertos SSH (50922:10022) y VNC (5999:5999), asignación de 8 GB de memoria RAM, 4 núcleos de CPU y la versión de sistema macOS Ventura:
+
+```bash
+docker run -it --name macos \
+  --device /dev/kvm \
+  -p 50922:10022 \
+  -p 5999:5999 \
+  -e GENERATE_UNIQUE=true \
+  -e MASTER_PLIST_URL='https://raw.githubusercontent.com/sickcodes/osx-serial-generator/master/config-custom.plist' \
+  -e SHORTNAME=ventura \
+  -e RAM=8 -e SMP=8 -e CORES=4 \
+  -e EXTRA="-display none -vnc 0.0.0.0:99,password=off" \
+  sickcodes/docker-osx:latest
+```
+
+![Descarga y ejecución del contenedor sickcodes/docker-osx](capturas/dockerrun.png)
+
+---
+
+### Paso 8. Conexión VNC y arranque de macOS Recovery
+Tras levantar el contenedor, se estableció conexión desde TigerVNC Viewer. Se observó el inicio del sistema operativo en modo detallado (*verbose boot*), cargando los módulos del kernel de Apple y servicios del sistema (`com.apple.xpc.launchd`, redes NAT64 y daemon de localización), para dar paso a la pantalla gráfica de arranque con el logotipo de Apple y la barra de progreso.
+
+![Arranque en modo verbose de macOS visualizado en TigerVNC](capturas/tigervnc.png)
+![Logs de inicialización y llamadas del sistema en arranque](capturas/arranque.png)
+![Pantalla gráfica de arranque con logotipo de Apple cargando](capturas/logoapple.png)
+
+---
+
+### Paso 9. Formatear el disco virtual en Disk Utility
+Al entrar al menú de macOS Recovery, se abrió la **Utilidad de Discos (Disk Utility)**. Se seleccionó la opción *"Show All Devices"* para visualizar el disco físico virtual `QEMU HARDDISK Media`, procediendo a borrar y formatear la unidad con los siguientes parámetros:
+- **Nombre:** `MacOs`
+- **Formato:** `APFS`
+- **Esquema:** `GUID Partition Map`
+
+![Utilidad de Discos en macOS Recovery con opción Show All Devices](capturas/MAC3.png)
+
+---
+
+### Paso 10. Proceso de instalación de macOS Ventura
+Con el disco formateado y listo, se inició el asistente de instalación de **macOS Ventura**, seleccionando la unidad `MacOs` como disco de destino y comenzando la descarga e instalación de los archivos del sistema base.
+
+![Instalador de macOS Ventura en ejecución mostrando el disco de destino y tiempo estimado](capturas/MAC4.png)
