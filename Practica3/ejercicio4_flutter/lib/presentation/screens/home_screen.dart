@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return PopScope(
       canPop: !provider.canNavigateUp,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         if (!didPop && provider.canNavigateUp) {
           provider.navigateUp();
         }

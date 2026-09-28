@@ -16,7 +16,7 @@ class FileListTile extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: AppColors.folderColor.withOpacity(0.15),
+          color: AppColors.folderColor.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(10),
         ),
         child: const Icon(Icons.folder, color: AppColors.folderColor, size: 28),
@@ -27,7 +27,7 @@ class FileListTile extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: AppColors.imageColor.withOpacity(0.15),
+          color: AppColors.imageColor.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(10),
         ),
         child: const Icon(Icons.image, color: AppColors.imageColor, size: 28),
@@ -38,7 +38,7 @@ class FileListTile extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: AppColors.textColor.withOpacity(0.15),
+          color: AppColors.textColor.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(10),
         ),
         child: const Icon(Icons.description, color: AppColors.textColor, size: 28),
@@ -48,7 +48,7 @@ class FileListTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: AppColors.defaultFileColor.withOpacity(0.15),
+        color: AppColors.defaultFileColor.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(10),
       ),
       child: const Icon(Icons.insert_drive_file, color: AppColors.defaultFileColor, size: 28),

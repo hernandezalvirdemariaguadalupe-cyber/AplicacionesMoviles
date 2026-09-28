@@ -45,7 +45,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.black.withOpacity(0.7),
+        backgroundColor: Colors.black.withValues(alpha: 0.7),
         foregroundColor: Colors.white,
         title: Text(
           widget.fileItem.name,

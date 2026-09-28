@@ -23,42 +23,40 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Card(
-            child: Column(
-              children: [
-                RadioListTile<InstitutionalTheme>(
-                  value: InstitutionalTheme.guindaIPN,
-                  groupValue: themeProvider.institutionalTheme,
-                  onChanged: (val) {
-                    if (val != null) themeProvider.setInstitutionalTheme(val);
-                  },
-                  title: const Text(
-                    'Tema Guinda (IPN)',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+            child: RadioGroup<InstitutionalTheme>(
+              groupValue: themeProvider.institutionalTheme,
+              onChanged: (val) {
+                if (val != null) themeProvider.setInstitutionalTheme(val);
+              },
+              child: const Column(
+                children: [
+                  RadioListTile<InstitutionalTheme>(
+                    value: InstitutionalTheme.guindaIPN,
+                    title: Text(
+                      'Tema Guinda (IPN)',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text('Color institucional del Instituto Politécnico Nacional'),
+                    secondary: CircleAvatar(
+                      backgroundColor: AppColors.ipnGuinda,
+                      radius: 16,
+                    ),
                   ),
-                  subtitle: const Text('Color institucional del Instituto Politécnico Nacional'),
-                  secondary: CircleAvatar(
-                    backgroundColor: AppColors.ipnGuinda,
-                    radius: 16,
+                  Divider(height: 1),
+                  RadioListTile<InstitutionalTheme>(
+                    value: InstitutionalTheme.azulESCOM,
+                    title: Text(
+                      'Tema Azul (ESCOM)',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text('Color institucional de la Escuela Superior de Cómputo'),
+                    secondary: CircleAvatar(
+                      backgroundColor: AppColors.escomAzul,
+                      radius: 16,
+                    ),
                   ),
-                ),
-                const Divider(height: 1),
-                RadioListTile<InstitutionalTheme>(
-                  value: InstitutionalTheme.azulESCOM,
-                  groupValue: themeProvider.institutionalTheme,
-                  onChanged: (val) {
-                    if (val != null) themeProvider.setInstitutionalTheme(val);
-                  },
-                  title: const Text(
-                    'Tema Azul (ESCOM)',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: const Text('Color institucional de la Escuela Superior de Cómputo'),
-                  secondary: CircleAvatar(
-                    backgroundColor: AppColors.escomAzul,
-                    radius: 16,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -68,38 +66,32 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Card(
-            child: Column(
-              children: [
-                RadioListTile<ThemeMode>(
-                  value: ThemeMode.system,
-                  groupValue: themeProvider.themeMode,
-                  onChanged: (val) {
-                    if (val != null) themeProvider.setThemeMode(val);
-                  },
-                  title: const Text('Automático (del sistema)'),
-                  secondary: const Icon(Icons.brightness_auto),
-                ),
-                const Divider(height: 1),
-                RadioListTile<ThemeMode>(
-                  value: ThemeMode.light,
-                  groupValue: themeProvider.themeMode,
-                  onChanged: (val) {
-                    if (val != null) themeProvider.setThemeMode(val);
-                  },
-                  title: const Text('Modo Claro'),
-                  secondary: const Icon(Icons.light_mode),
-                ),
-                const Divider(height: 1),
-                RadioListTile<ThemeMode>(
-                  value: ThemeMode.dark,
-                  groupValue: themeProvider.themeMode,
-                  onChanged: (val) {
-                    if (val != null) themeProvider.setThemeMode(val);
-                  },
-                  title: const Text('Modo Oscuro'),
-                  secondary: const Icon(Icons.dark_mode),
-                ),
-              ],
+            child: RadioGroup<ThemeMode>(
+              groupValue: themeProvider.themeMode,
+              onChanged: (val) {
+                if (val != null) themeProvider.setThemeMode(val);
+              },
+              child: const Column(
+                children: [
+                  RadioListTile<ThemeMode>(
+                    value: ThemeMode.system,
+                    title: Text('Automático (del sistema)'),
+                    secondary: Icon(Icons.brightness_auto),
+                  ),
+                  Divider(height: 1),
+                  RadioListTile<ThemeMode>(
+                    value: ThemeMode.light,
+                    title: Text('Modo Claro'),
+                    secondary: Icon(Icons.light_mode),
+                  ),
+                  Divider(height: 1),
+                  RadioListTile<ThemeMode>(
+                    value: ThemeMode.dark,
+                    title: Text('Modo Oscuro'),
+                    secondary: Icon(Icons.dark_mode),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -108,30 +100,30 @@ class SettingsScreen extends StatelessWidget {
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          Card(
+          const Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Instituto Politécnico Nacional',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                   ),
-                  const Text('Escuela Superior de Cómputo (ESCOM)'),
-                  const SizedBox(height: 8),
-                  const Text('Unidad de Aprendizaje: Desarrollo de Aplicaciones Móviles Nativas'),
-                  const Text('Profesor: Gabriel Hurtado Avilés'),
-                  const Text('Grupo: 7CV4 | Semestre 2027-1'),
-                  const SizedBox(height: 12),
-                  const Divider(),
-                  const SizedBox(height: 8),
-                  const Text(
+                  Text('Escuela Superior de Cómputo (ESCOM)'),
+                  SizedBox(height: 8),
+                  Text('Unidad de Aprendizaje: Desarrollo de Aplicaciones Móviles Nativas'),
+                  Text('Profesor: Gabriel Hurtado Avilés'),
+                  Text('Grupo: 7CV4 | Semestre 2027-1'),
+                  SizedBox(height: 12),
+                  Divider(),
+                  SizedBox(height: 8),
+                  Text(
                     'Desarrollado por:',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  const Text('• Hernández Alvirde María Guadalupe (2022630105)'),
-                  const Text('• Aragón Martínez Manuel Alejandro'),
+                  Text('• Hernández Alvirde María Guadalupe (2022630105)'),
+                  Text('• Aragón Martínez Manuel Alejandro'),
                 ],
               ),
             ),

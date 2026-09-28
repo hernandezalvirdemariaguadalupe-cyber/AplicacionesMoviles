@@ -90,7 +90,7 @@ class ThemeProvider extends ChangeNotifier {
         backgroundColor: primary,
         foregroundColor: Colors.white,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 1,
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -112,8 +112,8 @@ class ThemeProvider extends ChangeNotifier {
         secondary: secondary,
         brightness: Brightness.dark,
       ),
-      appBarTheme: AppBarTheme(
-        backgroundColor: const Color(0xFF1E1E1E),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF1E1E1E),
         foregroundColor: Colors.white,
         elevation: 2,
         centerTitle: false,
@@ -122,7 +122,7 @@ class ThemeProvider extends ChangeNotifier {
         backgroundColor: primary,
         foregroundColor: Colors.white,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 1,
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
