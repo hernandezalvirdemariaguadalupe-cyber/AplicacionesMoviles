@@ -58,44 +58,61 @@
 
 # Ejercicio 1: Instalación de macOS en la mejor PC del equipo
 
-## 1.1 Identificación del equipo
+## 1.1 Identificación y comparativa del equipo
 
-| Integrante | PROCESADPR | RAM | Almacenamiento | GPU |
+Para determinar qué máquina albergaría el entorno de desarrollo con macOS virtualizado en Docker, se evaluaron las características de hardware de los integrantes:
+
+| Integrante | Procesador | RAM | Almacenamiento | GPU |
 |---|---|---|---|---|
-| Maria Guadalupe Hernandez Alvirde | Intel(R) Core(TM) i7-6600U CPU @ 2.60GHz (2.80 GHz) | 16 GB | 450 GB| 128 MB Intel(R) HD Graphics 520 |
-| Nombre 2 | | | | |
+| **Maria Guadalupe Hernandez Alvirde** | Intel(R) Core(TM) i7-6600U CPU @ 2.60GHz (2.80 GHz) | 16.0 GB (2133 MHz) | 477 GB SSD (274 GB libres) | Intel(R) HD Graphics 520 (128 MB) |
+| **Manuel Alejandro Aragón Martínez** | Intel(R) Core(TM) i5-8265U CPU @ 1.60GHz (hasta 3.90 GHz) | 8.0 GB | 256 GB SSD | Gráficos integrados (Intel UHD Graphics 620) |
 
+**Equipo seleccionado:** Laptop DELL Latitude 7480 de Maria Guadalupe Hernandez Alvirde (Boleta: 2022630105).  
 
-**Equipo elegido:** PC de Maria Guadalupe Hernandez Alvirde Boleta: 2022630105.
-**Justificación:** Mayor RAM y núcleos del equipo, 200 GB libres y virtualización por hardware habilitada.
+**Justificación técnica de la elección:**
+1. **Memoria RAM disponible:** El despliegue de Docker (`docker run`) asigna 8 GB de RAM exclusivamente a la máquina virtual de macOS (`-e RAM=8`), y la configuración de `.wslconfig` reserva hasta 12 GB para WSL 2. En la computadora de Manuel Alejandro (8 GB de RAM en total), esta asignación provocaría un consumo del 100% de la memoria física y un colapso del sistema operativo anfitrión. En cambio, la máquina de Maria Guadalupe (16 GB de RAM) cuenta con margen suficiente para ejecutar Windows, Docker y la máquina virtual simultáneamente.
+2. **Capacidad de almacenamiento:** La imagen base de Docker-OSX, el sistema operativo macOS Ventura, el IDE Xcode (~12-15 GB) y los simuladores de iOS requieren decenas de gigabytes libres. La laptop seleccionada cuenta con más de 270 GB de espacio libre en disco sólido frente a los 256 GB totales del equipo secundario.
+3. **Aceleración por hardware:** La máquina elegida cuenta con virtualización por hardware (Intel VT-x) activada en firmware, indispensable para habilitar el módulo KVM en Linux y lograr un rendimiento utilizable en el entorno emulado.
 
-![CPU y virtualización habilitada](capturas/01_admin_tareas_cpu.png)
-![Memoria RAM](capturas/02_admin_tareas_memoria.png)
-![Disco](capturas/03_admin_tareas_disco.png)
+### Evidencia de especificaciones del hardware seleccionado
+![Información del sistema y especificaciones de la PC](capturas/infopc.png)
 
-## 1.3 Instalación de macOS con Docker
+---
 
-### Paso 1. Clonar el repositorio
-Se clonó `github.com/gabrielhuav/MacOS-Docker`.
-![Repositorio clonado](capturas/clonacion.png)
+## 1.3 Instalación del entorno macOS con Docker paso a paso
 
-### Paso 2. Instalar WSL 2 con Ubuntu
-`wsl --install -d Ubuntu` y verificación con `wsl -l -v`.
+### Paso 1. Clonar el repositorio oficial
+Se clonó el repositorio oficial `MacOS-Docker` desde GitHub dentro del directorio de trabajo de la práctica:
 
-![WSL con Ubuntu versión 2]()
+```cmd
+cd C:\Users\Lupita Alvirde.Lupita_Alvirde\Practica3
+git clone https://github.com/gabrielhuav/MacOS-Docker.git
+```
 
-### Paso 3. Integración de Docker Desktop con WSL
-Settings > Resources > WSL Integration > Ubuntu.
+![Clonación del repositorio MacOS-Docker](capturas/clonacion.png)
 
-![Docker WSL Integration]()
+---
 
-### Paso 4. Configurar virtualización anidada
-Archivo `.wslconfig` con `nestedVirtualization=true`, `memory` y `processors`, y reinicio con `wsl --shutdown`.
+### Paso 2. Instalación y verificación de WSL 2 con Ubuntu
+Se verificó la versión instalada de Docker (`Docker version 29.7.2, build a7dcaa6`), se instaló la distribución de Ubuntu sobre el subsistema de Windows para Linux y se comprobó mediante `wsl -l -v` que tanto Ubuntu como `docker-desktop` operan bajo la versión 2 de WSL. Asimismo, se configuró a Ubuntu como la distribución por defecto con `wsl --set-default Ubuntu`.
 
-![Contenido de .wslconfig]()
+```cmd
+docker --version
+wsl -l -v
+wsl --set-default Ubuntu
+```
 
-### Paso 5. Verificar KVM
-![kvm-ok: KVM acceleration can be used]()
+![Comandos de preparación y verificación de WSL](capturas/ubuntu.png)
+![Listado y confirmación de Ubuntu en WSL versión 2](capturas/wslversion.png)
+
+---
+
+### Paso 3. Integración de Docker Desktop con WSL 2
+En la interfaz gráfica de Docker Desktop, se accedió a la sección **Settings > Resources > WSL integration**, donde se activaron las opciones:
+- *Enable integration with my default WSL distro*
+- Interruptor para habilitar la distro adicional: **Ubuntu**
+
+Durante el proceso se verificaron los registros IPC del backend para confirmar la estabilidad de la comunicación entre Docker Desktop y la distribución Ubuntu.
 
 ### Paso 6. Problema con WSLg y solución por VNC
 WSLg creaba la ventana (aparecía el ícono en la barra de tareas) pero no la mostraba. Se modificó el arranque para exponer la pantalla por VNC en el puerto 5999 y se usó TigerVNC Viewer.
