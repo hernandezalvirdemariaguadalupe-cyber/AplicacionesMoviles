@@ -1,0 +1,5 @@
+<resources>
+    <style name="Theme.KmpMediaApp" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#6C1D45</item>
+    </style>
+</resources>
