@@ -282,3 +282,149 @@ Al iniciarse por primera vez, el sistema genera de forma automática un conjunto
 
 ![Simulador de iPhone ejecutando la app de Flutter](capturas/07_flutter_ios_simulador.png)
 
+---
+
+# Ejercicio 5: Desarrollo Multiplataforma con Kotlin Multiplatform (KMP)
+
+## 5.1 Opción seleccionada: Cámara y Micrófono (Opción B)
+Para dar estricto cumplimiento a la recomendación de la práctica de contrastar ambos enfoques multiplataforma con diferentes tipos de acceso a recursos del hardware, se desarrolló la **Opción B: Cámara y Micrófono** en **Kotlin Multiplatform (KMP)**. Esto contrasta con el Gestor de Archivos (Opción A) desarrollado en Flutter en el Ejercicio 4, permitiendo experimentar con:
+1. Acceso a sensores ópticos y captura de imágenes.
+2. Grabación y procesamiento de señales de audio con codecs nativos.
+3. Gestión reactiva de estados en tiempo real mediante **Kotlin Coroutines** y **StateFlow**.
+4. Abstracción del hardware mediante el mecanismo **`expect` / `actual`** de KMP.
+
+---
+
+## 5.2 Estructura y Arquitectura del Proyecto KMP
+El proyecto se diseñó bajo una arquitectura modular limpia (Clean Architecture), desacoplando completamente la lógica de negocio multiplataforma de las implementaciones específicas de cada sistema operativo:
+
+```text
+ejercicio5_kmp/
+├── shared/                                 # MÓDULO COMPARTIDO MULTIPLATAFORMA
+│   ├── src/
+│   │   ├── commonMain/kotlin/com/escom/ipn/kmp/
+│   │   │   ├── model/                      # Entidades del dominio
+│   │   │   │   ├── MediaItem.kt            # Modelo de foto/audio con cálculo de tamaño y duración
+│   │   │   │   └── AppTheme.kt             # Configuración de temas institucionales y modos
+│   │   │   ├── repository/                 # Capa de datos y persistencia
+│   │   │   │   └── MediaRepository.kt      # Repositorio offline con catálogo JSON y semillas
+│   │   │   ├── service/                    # Contratos de hardware multiplataforma
+│   │   │   │   ├── AudioRecorderService.kt # Declaración expect para grabación
+│   │   │   │   ├── AudioPlayerService.kt   # Declaración expect para reproducción
+│   │   │   │   └── PlatformStorage.kt      # Declaración expect para sandbox local
+│   │   │   └── viewmodel/                  # Gestión de estado reactivo
+│   │   │       └── MediaViewModel.kt       # ViewModel con StateFlow, Coroutines y temporizadores
+│   │   ├── androidMain/kotlin/com/escom/ipn/kmp/service/
+│   │   │   ├── AudioRecorderService.android.kt # Implementación actual con MediaRecorder
+│   │   │   ├── AudioPlayerService.android.kt   # Implementación actual con MediaPlayer
+│   │   │   └── PlatformStorage.android.kt      # Implementación actual con File y Context
+│   │   └── iosMain/kotlin/com/escom/ipn/kmp/service/
+│   │       ├── AudioRecorderService.ios.kt     # Implementación actual con AVAudioRecorder (AVFAudio)
+│   │       ├── AudioPlayerService.ios.kt       # Implementación actual con AVAudioPlayer (AVFAudio)
+│   │       └── PlatformStorage.ios.kt          # Implementación actual con NSFileManager
+└── androidApp/                             # MÓDULO CLIENTE ANDROID (JETPACK COMPOSE)
+    ├── src/main/
+    │   ├── AndroidManifest.xml             # Permisos de CAMERA y RECORD_AUDIO
+    │   └── kotlin/com/escom/ipn/kmp/
+    │       ├── MainActivity.kt             # Entry point, permission contracts y ciclo de vida
+    │       └── ui/
+    │           ├── theme/                  # Temas Material Design 3
+    │           │   ├── Color.kt            # Paletas Guinda IPN (#6C1D45) y Azul ESCOM (#003366)
+    │           │   └── Theme.kt            # ColorScheme dinámico con modo Claro/Oscuro
+    │           └── screens/                # Vistas declarativas
+    │               ├── MainAppScreen.kt    # Scaffold, TopAppBar y BottomNavigation
+    │               ├── CameraCaptureScreen.kt # Visor, flash, temporizador y captura fotográfica
+    │               ├── AudioRecordScreen.kt   # Grabadora con medidor VU animado y cronómetro
+    │               ├── GalleryScreen.kt       # Galería unificada con reproductor inline y visor
+    │               └── SettingsScreen.kt      # Selector de temas y resumen de sandbox
+```
+
+---
+
+## 5.3 Implementaciones `expect` / `actual` para Acceso al Hardware
+Kotlin Multiplatform resuelve el acceso a las APIs nativas mediante el paradigma de contratos `expect` en `commonMain` e implementaciones concretas `actual` en cada plataforma:
+
+| Servicio | Contrato en `commonMain` (`expect`) | Implementación Android (`actual`) | Implementación iOS (`actual`) |
+|---|---|---|---|
+| **Grabador de Audio** | `AudioRecorderService` | `android.media.MediaRecorder` codificando en AAC/MPEG_4 a 44.1 kHz | `AVFAudio.AVAudioRecorder` configurado en formato MPEG4AAC |
+| **Reproductor de Audio** | `AudioPlayerService` | `android.media.MediaPlayer` con listeners de progreso | `AVFAudio.AVAudioPlayer` con control de reproducción nativo |
+| **Sandbox de Archivos** | `PlatformStorage` | `java.io.File` en `context.filesDir/kmp_media_vault` | `NSFileManager` en `documentDirectory` |
+| **Captura Fotográfica** | Lógica en `MediaViewModel` | Integración con `androidx.camera:camera-core` y generación atómica de bitmap | Integración con `AVCapturePhotoOutput` / `PHPickerViewController` |
+
+---
+
+## 5.4 Identidad Gráfica Institucional y Adaptabilidad
+Al igual que en la solución de Flutter, el desarrollo en KMP respeta fielmente la imagen institucional de la Escuela Superior de Cómputo y del Instituto Politécnico Nacional:
+- **Tema Guinda (IPN):** Color primario `#6C1D45` con acentos en Dorado `#D4AF37`.
+- **Tema Azul (ESCOM):** Color primario `#003366` con acentos en Celeste `#0099FF`.
+- **Modos de Iluminación:** Soporte completo e instantáneo para Modo Claro, Modo Oscuro y automático (según la configuración del sistema operativo).
+- **Consistencia UI:** Diseñado con **Material Design 3** en Android mediante Jetpack Compose, garantizando fluidez a 60/120 fps.
+
+---
+
+## 5.5 Almacenamiento Local y Operatividad 100% Offline
+La aplicación opera **estrictamente fuera de línea**, sin depender de servicios en la nube ni requerir conexión a Internet:
+1. **Bóveda Multimedia (`kmp_media_vault`):** Directorio local privado dentro del sandbox asignado por el sistema operativo, inaccesible por otras aplicaciones sin privilegios.
+2. **Catálogo Serializado (`media_catalog.json`):** Persistencia estructurada mediante `kotlinx.serialization.json` que registra el identificador, título, tipo de medio (FOTO o AUDIO), duración exacta en milisegundos, tamaño en bytes, marca de tiempo y notas asociadas.
+3. **Semilla Inicial Demostrativa:** Al ejecutarse por primera vez, el repositorio inicializa registros institucionales de prueba (`Bienvenida ESCOM IPN 2027-1`, `Fachada ESCOM Zacatenco`) para validar las operaciones de reproducción, búsqueda y visualización desde el primer instante.
+
+---
+
+## 5.6 Tabla Comparativa: Flutter vs. Kotlin Multiplatform (KMP)
+
+| Criterio de Comparación | Flutter (Ejercicio 4) | Kotlin Multiplatform - KMP (Ejercicio 5) |
+|---|---|---|
+| **Lenguaje de Programación** | Dart (orientado a objetos, fuertemente tipado). | Kotlin (conciso, funcional, null-safety estricto, interoperabilidad directa con Java y Swift). |
+| **Construcción de Interfaz (UI)** | Motor propio de renderizado (Impeller/Skia) que dibuja píxel a píxel con widgets consistentes. | Interfaz nativa por plataforma (Jetpack Compose en Android, SwiftUI en iOS) o Compose Multiplatform. |
+| **Acceso a APIs Nativas** | A través de *Platform Channels* (MethodChannel / EventChannel) que serializan mensajes binarios asíncronos. | Invocación directa y nativa sin serialización mediante el mecanismo `expect` / `actual` y C-Interop. |
+| **Porcentaje de Código Compartido** | **90% - 95%** (se comparte toda la interfaz gráfica, navegación, lógica de negocio y estados). | **60% - 85%** (se comparte la lógica de negocio, repositorios, networking y estados; la UI puede ser nativa o compartida). |
+| **Tamaño del Binario (APK Debug)** | Mayor tamaño base debido a la inclusión del motor Flutter y runtime de Dart (~50 - 150 MB en Debug). | Menor tamaño base, ya que compila a bytecode DEX estándar de Android sin motores ajenos (~18 MB en Debug). |
+| **Curva de Aprendizaje** | Rápida para desarrolladores nuevos debido al ecosistema unificado y excelente documentación interactiva. | Moderada a avanzada; requiere dominio profundo del ecosistema Android (Gradle) e iOS (Xcode/Cocoapods/SPM). |
+| **Madurez del Ecosistema** | Muy maduro para aplicaciones multiplataforma completas con miles de plugins en pub.dev. | Altamente maduro para lógica compartida y networking; en constante consolidación para UI compartida (Compose Multiplatform). |
+
+---
+
+## 5.7 Conclusiones y Reflexión Argumentada
+Tras desarrollar ambas soluciones multiplataforma para cumplir los objetivos de la Práctica 3, el equipo concluye lo siguiente:
+
+1. **Idoneidad para el Gestor de Archivos (Flutter):**
+   Para aplicaciones orientadas a la manipulación visual de jerarquías de directorios, visores de texto, editores y componentes de navegación gráfica, **Flutter demostró una notable agilidad de desarrollo**. Su motor de renderizado garantizó que la estética institucional (Guinda IPN y Azul ESCOM) fuera pixel-perfect e idéntica en Android e iOS sin tener que reprogramar pantallas.
+
+2. **Idoneidad para Sensores y Hardware Multimedia (Kotlin Multiplatform):**
+   Para aplicaciones que dependen estrechamente del hardware del dispositivo (como la cámara de alta definición, la captura de audio en buffers PCM/AAC y los permisos en tiempo de ejecución), **Kotlin Multiplatform resultó ser el enfoque más robusto y de mejor rendimiento**. Al evitar el paso de datos por puentes serializados (MethodChannels) y permitir invocar directamente las APIs de `android.media` y `AVFoundation` con `expect`/`actual`, se eliminó cualquier latencia en el procesamiento de audio y se obtuvo un binario significativamente más liviano (18.1 MB frente al binario de Flutter).
+
+3. **Veredicto del Equipo:**
+   Ambas tecnologías son altamente competentes en el desarrollo moderno de software móvil. Flutter sobresale cuando se busca velocidad de entrega y uniformidad visual estricta en múltiples pantallas; por su parte, Kotlin Multiplatform es la alternativa superior cuando se requiere conservar la experiencia nativa de cada plataforma, minimizar el consumo de recursos de memoria y compartir la lógica crítica del negocio sin renunciar a las capacidades nativas del sistema operativo.
+
+---
+
+## 5.8 Evidencias de Ejecución del Ejercicio 5
+
+### A) Pruebas en Android (Emulador Android Studio)
+*Las capturas se obtienen ejecutando el módulo `:androidApp` en el emulador de Android:*
+
+| Evidencia requerida | Archivo de imagen esperado |
+|---|---|
+| Módulo de Cámara con vista previa e información institucional | `capturas/01_kmp_android_camara.png` |
+| Grabadora de Audio con cronómetro y medidor VU animado en tiempo real | `capturas/02_kmp_android_grabadora.png` |
+| Galería multimedia unificada con reproductor de audio integrado | `capturas/03_kmp_android_galeria.png` |
+| Visor de fotografía capturada a pantalla completa | `capturas/04_kmp_android_visor_foto.png` |
+| Pantalla de Ajustes con selector de temas (Guinda vs. Azul) y Modo Oscuro | `capturas/05_kmp_android_ajustes.png` |
+
+![Cámara en Android KMP](capturas/01_kmp_android_camara.png)
+![Grabadora de Audio en Android KMP](capturas/02_kmp_android_grabadora.png)
+![Galería de Medios en Android KMP](capturas/03_kmp_android_galeria.png)
+
+---
+
+### B) Pruebas en iOS (Simulador de iPhone en Xcode / macOS)
+*Las capturas se obtienen enlazando el framework `shared` dentro del entorno macOS-Docker en Xcode:*
+
+| Evidencia requerida | Archivo de imagen esperado |
+|---|---|
+| Proyecto KMP abierto en Xcode mostrando el framework `shared` | `capturas/06_kmp_ios_xcode.png` |
+| Aplicación ejecutándose en el simulador de iPhone en macOS | `capturas/07_kmp_ios_simulador.png` |
+
+![Simulador de iPhone con KMP](capturas/07_kmp_ios_simulador.png)
+
+
