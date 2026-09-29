@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import '../models/file_item.dart';
 
@@ -9,8 +10,25 @@ class FileRepository {
     if (!await appSandbox.exists()) {
       await appSandbox.create(recursive: true);
       await _createInitialSampleFiles(appSandbox.path);
+    } else {
+      await _ensureSampleImageExists(appSandbox.path);
     }
     return appSandbox;
+  }
+
+  Future<void> _ensureSampleImageExists(String rootPath) async {
+    final target = File('$rootPath/logo_ipn.png');
+    final galleryTarget = File('$rootPath/Galeria_Local/logo_ipn.png');
+    try {
+      final byteData = await rootBundle.load('assets/images/logo_ipn.png');
+      final bytes = byteData.buffer.asUint8List();
+      if (!await target.exists() || (await target.length()) != bytes.length) {
+        await target.writeAsBytes(bytes);
+      }
+      if (!await galleryTarget.exists() || (await galleryTarget.length()) != bytes.length) {
+        await galleryTarget.writeAsBytes(bytes);
+      }
+    } catch (_) {}
   }
 
   Future<void> _createInitialSampleFiles(String rootPath) async {
@@ -62,6 +80,9 @@ Grupo: 7CV4
     await imgFolder.create();
     final readmeImg = File('${imgFolder.path}/acerca_de_la_galeria.txt');
     await readmeImg.writeAsString('Esta carpeta almacena recursos gráficos locales de la aplicación.');
+
+    // 5. Institutional Sample Image
+    await _ensureSampleImageExists(rootPath);
   }
 
   Future<List<FileItem>> listDirectory(String directoryPath, Set<String> favorites) async {

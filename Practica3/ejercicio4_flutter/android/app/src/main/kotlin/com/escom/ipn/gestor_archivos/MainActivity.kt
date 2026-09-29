@@ -1,4 +1,4 @@
-package com.example.hola_mundo_flutter
+package com.escom.ipn.gestor_archivos
 
 import io.flutter.embedding.android.FlutterActivity
 
