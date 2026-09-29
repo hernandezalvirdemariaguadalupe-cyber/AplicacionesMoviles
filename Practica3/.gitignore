@@ -6,6 +6,7 @@
 .pub-cache/
 .pub/
 build/
+**/build/
 ephemeral/
 
 # IDE & Editor files
@@ -17,6 +18,7 @@ ephemeral/
 
 # Android build & secrets
 .gradle/
+**/.gradle/
 **/local.properties
 **/android/app/debug
 **/android/app/profile
@@ -33,6 +35,14 @@ ephemeral/
 **/*.xccheckout
 **/*.xcscmblueprint
 
+# Kotlin & KMP Build caches
+.kotlin/
+**/.kotlin/
+.cxx/
+**/.cxx/
+*.hprof
+
 # OS generated
 .DS_Store
 Thumbs.db
+
