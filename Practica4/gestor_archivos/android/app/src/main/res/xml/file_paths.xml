@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Almacenamiento privado de la app (getApplicationSupportDirectory = filesDir) -->
+    <files-path name="privado" path="." />
+    <!-- Copias temporales para compartir -->
+    <cache-path name="cache" path="." />
+</paths>
