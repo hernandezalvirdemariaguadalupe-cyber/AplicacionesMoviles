@@ -269,8 +269,9 @@ class _BrowserPageState extends State<BrowserPage> {
         body: Column(children: [
           Breadcrumbs(segments: segments, onTap: _goTo),
           Expanded(child: _content(app, visible)),
-          if (app.clipboard != null) _clipboardBar(app.clipboard!),
         ]),
+        // En la ranura inferior del Scaffold el botón flotante se coloca encima de la barra.
+        bottomNavigationBar: app.clipboard == null ? null : _clipboardBar(app.clipboard!),
         floatingActionButton: error == null
             ? FloatingActionButton(
                 tooltip: 'Nuevo',

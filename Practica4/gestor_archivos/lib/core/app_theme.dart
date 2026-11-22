@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Temas institucionales. Cada uno tiene variante clara y oscura; MaterialApp elige
 /// automáticamente según el modo del sistema (ThemeMode.system).
@@ -30,6 +31,9 @@ class AppTheme {
         backgroundColor: dark ? scheme.surfaceContainer : palette.primary,
         foregroundColor: dark ? scheme.onSurface : Colors.white,
         centerTitle: false,
+        // La barra superior siempre es oscura (guinda/azul o gris en modo oscuro):
+        // íconos de la barra de estado claros para que sean legibles.
+        systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
       navigationBarTheme: NavigationBarThemeData(indicatorColor: scheme.primaryContainer),
       floatingActionButtonTheme: FloatingActionButtonThemeData(

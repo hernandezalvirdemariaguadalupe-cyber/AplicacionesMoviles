@@ -217,28 +217,50 @@ class _DocumentViewerState extends State<DocumentViewer> {
             ViewerKind.markdown => Syntax.markdown(f.text, colors),
             _ => [TextSpan(text: f.text)],
           };
-    final lines = '\n'.allMatches(f.text).length + 1;
+    final lines = _splitLines(spans);
     final scheme = Theme.of(context).colorScheme;
+    final digits = lines.length.toString().length;
+    final charW = (TextPainter(text: TextSpan(text: 'M', style: mono), textDirection: TextDirection.ltr)..layout()).width;
+    final gutterW = charW * digits + 16;
+    final gutterColor = scheme.surfaceContainerHighest.withValues(alpha: 0.5);
+    final base = mono.copyWith(color: colors.plain);
 
-    final text = Padding(
-      padding: const EdgeInsets.all(12),
-      child: SelectableText.rich(
-        TextSpan(style: mono.copyWith(color: colors.plain), children: spans),
-      ),
+    // Cada línea lleva su número al lado: coinciden aunque la línea se ajuste,
+    // y ListView sólo construye las líneas visibles (archivos grandes).
+    Widget lineRow(int i) => IntrinsicHeight(
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Container(
+              width: gutterW,
+              color: gutterColor,
+              padding: const EdgeInsets.only(right: 8),
+              child: Text('${i + 1}', textAlign: TextAlign.right, style: mono.copyWith(color: scheme.outline)),
+            ),
+            const SizedBox(width: 12),
+            if (wrap)
+              Expanded(child: Text.rich(TextSpan(style: base, children: lines[i])))
+            else
+              Text.rich(TextSpan(style: base, children: lines[i]), softWrap: false),
+          ]),
+        );
+
+    final list = ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      itemCount: lines.length,
+      itemBuilder: (_, i) => lineRow(i),
     );
-    final content = Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      // Números de línea
-      Container(
-        padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
-        color: scheme.surfaceContainerHighest.withValues(alpha: 0.5),
-        child: Text(
-          List.generate(lines, (i) => '${i + 1}').join('\n'),
-          textAlign: TextAlign.right,
-          style: mono.copyWith(color: scheme.outline),
-        ),
-      ),
-      if (wrap) Expanded(child: text) else text,
-    ]);
+    var longest = 0;
+    for (final l in lines) {
+      final len = l.fold<int>(0, (a, s) => a + (s.text?.length ?? 0));
+      if (len > longest) longest = len;
+    }
+    final content = SelectionArea(
+      child: wrap
+          ? list
+          : SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SizedBox(width: gutterW + 24 + charW * (longest + 2), child: list),
+            ),
+    );
 
     return Column(children: [
       if (f.error != null)
@@ -258,13 +280,23 @@ class _DocumentViewerState extends State<DocumentViewer> {
           content: Text('Resaltado desactivado por el tamaño del archivo.'),
           actions: [SizedBox.shrink()],
         ),
-      Expanded(
-        child: SingleChildScrollView(
-          child: wrap
-              ? content
-              : SingleChildScrollView(scrollDirection: Axis.horizontal, child: content),
-        ),
-      ),
+      Expanded(child: content),
     ]);
+  }
+
+  /// Parte la lista de fragmentos resaltados en líneas, conservando el estilo
+  /// de cada fragmento aunque cruce un salto de línea.
+  static List<List<TextSpan>> _splitLines(List<TextSpan> spans) {
+    final out = <List<TextSpan>>[[]];
+    for (final s in spans) {
+      final parts = (s.text ?? '').split('\n');
+      for (var i = 0; i < parts.length; i++) {
+        if (i > 0) out.add([]);
+        if (parts[i].isNotEmpty) out.last.add(TextSpan(text: parts[i], style: s.style));
+      }
+    }
+    // El resaltado de Markdown agrega un salto final; no se muestra como línea vacía extra.
+    if (out.length > 1 && out.last.isEmpty) out.removeLast();
+    return out;
   }
 }
