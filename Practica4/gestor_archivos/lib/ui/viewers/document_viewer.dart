@@ -29,7 +29,8 @@ class _DocumentViewerState extends State<DocumentViewer> {
   Object? error;
   bool truncated = false;
   bool pretty = true;
-  bool wrap = true;
+  // En código estructurado no se ajustan líneas para que coincidan los números de línea.
+  late bool wrap = kind == ViewerKind.text || kind == ViewerKind.markdown;
   bool editing = false;
   bool dirty = false;
   double fontSize = 14;
