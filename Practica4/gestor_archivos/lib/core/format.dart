@@ -42,5 +42,8 @@ String fnv1a(String input) {
     hash ^= c;
     hash = (hash * prime) & 0xFFFFFFFFFFFFFFFF;
   }
-  return hash.toUnsigned(64).toRadixString(16);
+  // Los int de Dart son de 64 bits con signo: se imprime en dos mitades de 32 bits
+  // para obtener siempre 16 dígitos hexadecimales sin signo.
+  String half(int v) => (v & 0xFFFFFFFF).toRadixString(16).padLeft(8, '0');
+  return half(hash >> 32) + half(hash);
 }

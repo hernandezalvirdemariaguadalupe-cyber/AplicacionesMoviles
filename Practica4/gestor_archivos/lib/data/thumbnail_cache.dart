@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -53,7 +54,11 @@ class ThumbnailCache {
       hits++;
       return Future.value(mem);
     }
-    return _inFlight.putIfAbsent(k, () => _load(e, k).whenComplete(() => _inFlight.remove(k)));
+    // Ojo: el callback NO debe devolver el Future removido; whenComplete esperaría
+    // a ese mismo Future y la carga nunca terminaría (bloqueo circular).
+    return _inFlight.putIfAbsent(k, () => _load(e, k).whenComplete(() {
+          _inFlight.remove(k);
+        }));
   }
 
   Future<Uint8List?> _load(FsEntry e, String k) async {
@@ -75,7 +80,8 @@ class ThumbnailCache {
       final bytes = data.buffer.asUint8List();
       await file.writeAsBytes(bytes);
       return _remember(k, bytes);
-    } catch (_) {
+    } catch (err) {
+      debugPrint('Miniatura no disponible para ${e.name}: $err');
       return null; // imagen corrupta o ilegible → se muestra el icono genérico
     }
   }
