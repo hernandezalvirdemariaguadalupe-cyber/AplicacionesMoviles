@@ -110,7 +110,7 @@ def apply_history_add(user_id, payload, ts):
     entry = SearchHistory(
         user_id=user_id,
         client_id=client_id,
-        query=query,
+        query_text=query,
         results_count=max(0, _opt_int(payload.get("results_count")) or 0),
         created_at=ts,
     )

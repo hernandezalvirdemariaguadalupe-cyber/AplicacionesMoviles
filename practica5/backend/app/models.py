@@ -70,7 +70,8 @@ class SearchHistory(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
     # UUID generado en el dispositivo: hace idempotente el reenvío desde la cola offline.
     client_id = db.Column(db.String(64), nullable=False)
-    query = db.Column(db.String(200), nullable=False)
+    # El atributo no puede llamarse "query": ocultaría Model.query de Flask-SQLAlchemy.
+    query_text = db.Column("query", db.String(200), nullable=False)
     results_count = db.Column(db.Integer, nullable=False, default=0)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
@@ -78,7 +79,7 @@ class SearchHistory(db.Model):
         return {
             "id": self.id,
             "client_id": self.client_id,
-            "query": self.query,
+            "query": self.query_text,
             "results_count": self.results_count,
             "created_at": self.created_at.isoformat(),
         }
