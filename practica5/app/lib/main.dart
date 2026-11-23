@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'app_state.dart';
 import 'config.dart';
+import 'core/tls.dart';
 import 'data/local_db.dart';
 import 'ui/screens/home_screen.dart';
 import 'ui/screens/login_screen.dart';
@@ -11,6 +12,7 @@ import 'ui/widgets/common.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await installExtraRootCertificates();
   final configError = AppConfig.validateApiBaseUrl(releaseMode: kReleaseMode);
   if (configError != null) {
     runApp(ConfigErrorApp(message: configError));

@@ -1,3 +1,5 @@
+import 'dart:io' show HandshakeException, TlsException;
+
 import 'package:dio/dio.dart';
 
 enum ErrorKind { network, timeout, http, unauthorized, forbidden, rateLimited, malformed, unknown }
@@ -43,6 +45,7 @@ class AppException implements Exception {
       case DioExceptionType.transformTimeout:
         return AppException(ErrorKind.timeout, 'El servidor tardó demasiado en responder.');
       case DioExceptionType.connectionError:
+        if (e.error is HandshakeException || e.error is TlsException) return _tls();
         return AppException(ErrorKind.network, 'No se pudo conectar. Revisa tu conexión a Internet.');
       case DioExceptionType.badCertificate:
         return AppException(ErrorKind.network, 'Certificado HTTPS no válido.');
@@ -64,9 +67,14 @@ class AppException implements Exception {
       case DioExceptionType.unknown:
         final inner = e.error;
         if (inner is FormatException) return AppException.from(inner);
+        if (inner is HandshakeException || inner is TlsException) return _tls();
         return AppException(ErrorKind.network, 'No se pudo conectar. Revisa tu conexión a Internet.');
     }
   }
+
+  /// Fallo de TLS (p. ej. raíz de certificados que el sistema no conoce): no es falta de Internet.
+  static AppException _tls() =>
+      AppException(ErrorKind.network, 'Certificado HTTPS no válido o no reconocido por este dispositivo.');
 
   static String? _serverMessage(Object? data) {
     if (data is Map && data['error'] is String) return data['error'] as String;

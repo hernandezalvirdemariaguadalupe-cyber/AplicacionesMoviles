@@ -6,6 +6,7 @@ import 'dart:io' show Platform;
 
 import 'package:biblioteca_app/app_state.dart';
 import 'package:biblioteca_app/config.dart';
+import 'package:biblioteca_app/core/tls.dart';
 import 'package:biblioteca_app/data/local_db.dart';
 import 'package:biblioteca_app/main.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -54,6 +55,7 @@ void main() {
   }
 
   Future<AppState> launch(WidgetTester tester) async {
+    await installExtraRootCertificates();
     final local = await LocalDb.open(name: 'e2e_${DateTime.now().millisecondsSinceEpoch}.db');
     final state = AppState(local: local, apiBaseUrl: AppConfig.apiBaseUrl);
     await tester.pumpWidget(BibliotecaApp(state: state));
@@ -160,6 +162,10 @@ void main() {
     await capture(tester, 'admin_denegado');
 
     // E9 · Cierre de sesión y restauración ----------------------------------------------------------
+    // Espera a que se cierre el aviso de "Acceso denegado": en pantallas como la del iPhone
+    // cubre el botón de cerrar sesión y absorbería el toque.
+    ScaffoldMessenger.of(tester.element(find.byKey(const Key('nav_profile')))).hideCurrentSnackBar();
+    await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.byKey(const Key('logout_button')), 300);
     await tester.tap(find.byKey(const Key('logout_button')));
     await waitFor(tester, find.byKey(const Key('username_field')));
