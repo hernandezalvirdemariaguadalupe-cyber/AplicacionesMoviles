@@ -4,3 +4,4 @@ instance/
 .env
 venv/
 .venv/
+.pytest_cache/

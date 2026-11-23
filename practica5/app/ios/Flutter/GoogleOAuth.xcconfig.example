@@ -1,0 +1,5 @@
+// Copia este archivo como GoogleOAuth.xcconfig (está en .gitignore) y pon tus valores.
+// GOOGLE_REVERSED_CLIENT_ID es el client ID de iOS al revés:
+//   123-abc.apps.googleusercontent.com  ->  com.googleusercontent.apps.123-abc
+GOOGLE_IOS_CLIENT_ID = 123-abc.apps.googleusercontent.com
+GOOGLE_REVERSED_CLIENT_ID = com.googleusercontent.apps.123-abc

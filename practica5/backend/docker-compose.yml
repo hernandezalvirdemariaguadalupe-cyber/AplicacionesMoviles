@@ -1,12 +1,25 @@
 services:
   api:
     build: .
-    container_name: tareas_api
+    container_name: practica5_api
     ports:
       - "5000:5000"
     volumes:
       - ./instance:/app/instance
+    env_file:
+      - path: .env
+        required: false
     environment:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-secret-key-cambiar-en-produccion}
-      - JWT_EXPIRES_MINUTES=${JWT_EXPIRES_MINUTES:-60}
+      - JWT_EXPIRES_MINUTES=${JWT_EXPIRES_MINUTES:-1440}
     restart: unless-stopped
+
+  # Túnel HTTPS opcional para probar desde el teléfono/simulador sin desplegar:
+  #   docker compose --profile tunnel up
+  # La URL https://*.trycloudflare.com aparece en los logs del servicio "tunnel".
+  tunnel:
+    image: cloudflare/cloudflared:2024.10.0
+    command: tunnel --no-autoupdate --url http://api:5000
+    depends_on:
+      - api
+    profiles: ["tunnel"]
