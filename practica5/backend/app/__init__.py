@@ -60,8 +60,18 @@ def create_app(test_config=None):
     from app import models  # noqa: F401
 
     with app.app_context():
-        db.create_all()
-        _seed_admin(app)
+        # Con varios procesos (gunicorn) otro worker pudo crear tablas/admin primero:
+        # se toleran esas carreras en lugar de abortar el arranque.
+        try:
+            db.create_all()
+        except Exception:  # noqa: BLE001
+            db.session.rollback()
+            app.logger.warning("create_all fallo (probablemente otro worker ya creo las tablas)")
+        try:
+            _seed_admin(app)
+        except Exception:  # noqa: BLE001
+            db.session.rollback()
+            app.logger.warning("No se pudo sembrar el admin (probablemente ya existe)")
 
     from app.routes_auth import auth_bp
     from app.routes_tasks import tasks_bp
