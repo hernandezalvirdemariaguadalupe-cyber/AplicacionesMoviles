@@ -20,7 +20,6 @@
 | Nombre Completo | Boleta |
 | :--- | :---: |
 | **Hernández Alvirde María Guadalupe** | 2022630105 |
-| **Aragón Martínez Manuel Alejandro** | 2023630411 |
 
 <br/>
 
