@@ -34,13 +34,23 @@ void main() {
   }
 
   /// Espera hasta que aparezca [finder] (peticiones de red reales).
-  Future<void> waitFor(WidgetTester tester, Finder finder, {int seconds = 30}) async {
+  Future<void> waitFor(WidgetTester tester, Finder finder, {int seconds = 60}) async {
     final end = DateTime.now().add(Duration(seconds: seconds));
     while (DateTime.now().isBefore(end)) {
       await tester.pump(const Duration(milliseconds: 250));
       if (finder.evaluate().isNotEmpty) return;
     }
-    throw TestFailure('No apareció: $finder');
+    // Captura del estado real de la pantalla para diagnosticar el fallo.
+    final visible = find.byType(Text).evaluate().map((e) => (e.widget as Text).data).whereType<String>();
+    await capture(tester, 'FALLO');
+    throw TestFailure('No apareció: $finder\nTextos en pantalla: ${visible.take(25).join(' | ')}');
+  }
+
+  /// Escribe en el buscador y pulsa el botón de búsqueda (sin depender del teclado del sistema).
+  Future<void> search(WidgetTester tester, String text) async {
+    tester.widget<TextField>(find.byKey(const Key('search_field'))).controller!.text = text;
+    await tester.tap(find.byKey(const Key('search_button')));
+    await tester.pump();
   }
 
   Future<AppState> launch(WidgetTester tester) async {
@@ -87,20 +97,17 @@ void main() {
     // E3 · Búsqueda en API pública + historial ------------------------------------------------
     await tester.tap(find.byKey(const Key('nav_search')));
     await tester.pumpAndSettle();
-    await tester.enterText(find.byKey(const Key('search_field')), 'tolkien hobbit');
-    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await search(tester, 'tolkien hobbit');
     await waitFor(tester, find.byKey(const Key('results_list')));
     await capture(tester, 'busqueda_open_library');
 
     // E4 · Estado vacío -------------------------------------------------------------------------
-    await tester.enterText(find.byKey(const Key('search_field')), 'zzqxwvkj sin resultados 9871');
-    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await search(tester, 'zzqxwvkj sin resultados 9871');
     await waitFor(tester, find.byKey(const Key('empty_results')));
     await capture(tester, 'estado_vacio');
 
     // E5 · Detalle + favorito ------------------------------------------------------------------
-    await tester.enterText(find.byKey(const Key('search_field')), 'tolkien hobbit');
-    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await search(tester, 'tolkien hobbit');
     await waitFor(tester, find.byKey(const Key('results_list')));
     await tester.tap(
       find.descendant(of: find.byKey(const Key('results_list')), matching: find.byType(ListTile)).first,

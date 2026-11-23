@@ -45,9 +45,9 @@ En la columna Auto, **E2E** quiere decir que lo cubre la prueba automatizada `in
 
 | Suite | Comando | Casos | Resultado |
 |---|---|---|---|
-| Backend (pytest) | `python -m pytest -v` | 10 | |
+| Backend (pytest) | `python -m pytest -v` | 10 | ✅ 10/10 (local, Python 3.12, Windows) |
 | App unitarias | `flutter test` | 10 | ✅ 10/10 (local, Windows) |
-| E2E Android | `flutter drive … -d emulator-5554` | 1 flujo / 9 escenarios | |
+| E2E Android | `flutter drive … -d emulator-5554` | 1 flujo / 10 escenarios (con admin) | ✅ aprobado en emulador `Medium_Phone_API_37.0` (Android 17), 12 capturas en [`evidencias/android`](evidencias/android) |
 | E2E iOS | GitHub Actions `ios-e2e` | 1 flujo / 9 escenarios | |
 
 ## Defectos (issues)
