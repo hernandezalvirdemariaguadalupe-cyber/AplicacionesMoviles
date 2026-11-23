@@ -1,3 +1,4 @@
+import os
 import uuid
 
 import pytest
@@ -15,7 +16,8 @@ def fake_google_verifier(raw):
 
 @pytest.fixture()
 def client(tmp_path, monkeypatch):
-    monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path / 'test.db'}")
+    # TEST_DATABASE_URL permite correr la suite contra Postgres real (CI); si no, SQLite temporal.
+    monkeypatch.setenv("DATABASE_URL", os.environ.get("TEST_DATABASE_URL") or f"sqlite:///{tmp_path / 'test.db'}")
     monkeypatch.setenv("ADMIN_USERNAME", "admin")
     monkeypatch.setenv("ADMIN_PASSWORD", "admin-pass-123")
     monkeypatch.setenv("ADMIN_EMAILS", "jefa@example.com")

@@ -17,9 +17,12 @@ def _database_uri(instance_dir):
     url = os.environ.get("DATABASE_URL", "").strip()
     if not url:
         return f"sqlite:///{os.path.join(instance_dir, 'app.db')}"
-    # Render/Heroku entregan "postgres://", SQLAlchemy 2 necesita "postgresql://".
-    if url.startswith("postgres://"):
-        url = "postgresql://" + url[len("postgres://"):]
+    # Render entrega "postgres://" o "postgresql://": se fija explícitamente el driver psycopg 3
+    # (el que está en requirements.txt) para no depender del driver por defecto de SQLAlchemy.
+    for prefix in ("postgres://", "postgresql://"):
+        if url.startswith(prefix):
+            url = "postgresql+psycopg://" + url[len(prefix):]
+            break
     return url
 
 
