@@ -1,0 +1,33 @@
+# Blueprint de Render para el backend de la Práctica 5 (HTTPS automático, plan gratuito).
+# Render > New > Blueprint > selecciona este repositorio. Los valores con sync:false se
+# capturan en el panel de Render; nunca se escriben aquí.
+services:
+  - type: web
+    name: practica5-api
+    runtime: docker
+    plan: free
+    rootDir: practica5/backend
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: JWT_EXPIRES_MINUTES
+        value: "1440"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: practica5-db
+          property: connectionString
+      - key: GOOGLE_CLIENT_IDS
+        sync: false
+      - key: ADMIN_EMAILS
+        sync: false
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+
+databases:
+  - name: practica5-db
+    plan: free

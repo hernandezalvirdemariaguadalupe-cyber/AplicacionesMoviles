@@ -1,0 +1,175 @@
+# Práctica 5 — CI multiplataforma.
+# - backend: pytest del API Flask.
+# - flutter: análisis estático + pruebas unitarias.
+# - android-e2e / ios-e2e: la MISMA prueba funcional (integration_test/app_test.dart) en un emulador
+#   Android (API 24 = Android 7.0) y en un simulador de iPhone (macOS + Xcode de GitHub),
+#   con capturas y video como artefactos descargables.
+#
+# Secrets/variables del repositorio (Settings > Secrets and variables > Actions):
+#   API_BASE_URL            (variable)  URL HTTPS del backend desplegado (Render)
+#   GOOGLE_SERVER_CLIENT_ID (variable)  client ID Web de Google (opcional)
+#   GOOGLE_IOS_CLIENT_ID    (variable)  client ID iOS de Google (opcional)
+#   E2E_ADMIN_USERNAME / E2E_ADMIN_PASSWORD (secrets) cuenta admin para el escenario de administrador (opcional)
+name: practica5
+
+on:
+  push:
+    branches: [main, practica5]
+    paths: ['practica5/**', '.github/workflows/practica5.yml']
+  pull_request:
+    paths: ['practica5/**', '.github/workflows/practica5.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: practica5-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: practica5/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest -v
+
+  flutter:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: practica5/app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
+  android-e2e:
+    needs: flutter
+    if: ${{ vars.API_BASE_URL != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Habilitar KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Configuración (sin secretos en el repo)
+        working-directory: practica5/app
+        run: |
+          mkdir -p config
+          jq -n --arg api "${{ vars.API_BASE_URL }}" --arg web "${{ vars.GOOGLE_SERVER_CLIENT_ID }}" \
+                --arg ios "${{ vars.GOOGLE_IOS_CLIENT_ID }}" --arg au "${{ secrets.E2E_ADMIN_USERNAME }}" \
+                --arg ap "${{ secrets.E2E_ADMIN_PASSWORD }}" \
+            '{API_BASE_URL:$api, GOOGLE_SERVER_CLIENT_ID:$web, GOOGLE_IOS_CLIENT_ID:$ios, ADMIN_USERNAME:$au, ADMIN_PASSWORD:$ap}' > config/ci.json
+          flutter pub get
+      - name: Prueba E2E en emulador Android 7.0 (API 24)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 24
+          arch: x86_64
+          target: google_apis
+          profile: pixel_4
+          disable-animations: true
+          working-directory: practica5/app
+          script: |
+            adb shell getprop ro.build.version.release > integration_test/device-android.txt; adb shell getprop ro.product.model >> integration_test/device-android.txt
+            flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart --dart-define-from-file=config/ci.json -d emulator-5554
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidencias-android
+          path: |
+            practica5/app/integration_test/screenshots/
+            practica5/app/integration_test/device-android.txt
+
+  ios-e2e:
+    needs: flutter
+    runs-on: macos-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: practica5/app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Configuración (sin secretos en el repo)
+        run: |
+          mkdir -p config
+          jq -n --arg api "${{ vars.API_BASE_URL }}" --arg web "${{ vars.GOOGLE_SERVER_CLIENT_ID }}" \
+                --arg ios "${{ vars.GOOGLE_IOS_CLIENT_ID }}" --arg au "${{ secrets.E2E_ADMIN_USERNAME }}" \
+                --arg ap "${{ secrets.E2E_ADMIN_PASSWORD }}" \
+            '{API_BASE_URL:$api, GOOGLE_SERVER_CLIENT_ID:$web, GOOGLE_IOS_CLIENT_ID:$ios, ADMIN_USERNAME:$au, ADMIN_PASSWORD:$ap}' > config/ci.json
+          IOS_ID="${{ vars.GOOGLE_IOS_CLIENT_ID }}"
+          if [ -z "$IOS_ID" ]; then IOS_ID="000-placeholder.apps.googleusercontent.com"; fi
+          REVERSED="com.googleusercontent.apps.${IOS_ID%.apps.googleusercontent.com}"
+          printf 'GOOGLE_IOS_CLIENT_ID = %s\nGOOGLE_REVERSED_CLIENT_ID = %s\n' "$IOS_ID" "$REVERSED" > ios/Flutter/GoogleOAuth.xcconfig
+          flutter pub get
+      - name: Compilar para simulador iOS (sin firma)
+        run: flutter build ios --simulator --debug --dart-define-from-file=config/ci.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Runner-ios-simulator.app
+          path: practica5/app/build/ios/iphonesimulator/Runner.app
+      - name: Arrancar simulador de iPhone
+        if: ${{ vars.API_BASE_URL != '' }}
+        run: |
+          UDID=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          devs = json.load(sys.stdin)['devices']
+          runtimes = sorted([k for k in devs if 'iOS' in k], reverse=True)
+          for rt in runtimes:
+              for d in devs[rt]:
+                  if d['name'].startswith('iPhone'):
+                      print(d['udid']); sys.exit(0)
+          ")
+          echo "UDID=$UDID" >> "$GITHUB_ENV"
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl list devices | grep "$UDID" > integration_test/device-ios.txt
+          xcrun simctl getenv "$UDID" SIMULATOR_RUNTIME_VERSION >> integration_test/device-ios.txt || true
+          cat integration_test/device-ios.txt
+      - name: Prueba E2E en simulador iOS (con video)
+        if: ${{ vars.API_BASE_URL != '' }}
+        run: |
+          xcrun simctl io "$UDID" recordVideo --codec=h264 --force integration_test/ios-e2e.mp4 &
+          REC=$!
+          set +e
+          flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart \
+            --dart-define-from-file=config/ci.json -d "$UDID"
+          STATUS=$?
+          kill -INT $REC; wait $REC
+          exit $STATUS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidencias-ios
+          path: |
+            practica5/app/integration_test/screenshots/
+            practica5/app/integration_test/device-ios.txt
+            practica5/app/integration_test/ios-e2e.mp4
