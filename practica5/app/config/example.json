@@ -1,5 +1,5 @@
 {
-  "API_BASE_URL": "https://tu-servicio.onrender.com",
+  "API_BASE_URL": "https://practica5-api.onrender.com",
   "GOOGLE_SERVER_CLIENT_ID": "xxxxxxxx-web.apps.googleusercontent.com",
   "GOOGLE_IOS_CLIENT_ID": "xxxxxxxx-ios.apps.googleusercontent.com"
 }
