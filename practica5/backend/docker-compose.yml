@@ -1,0 +1,12 @@
+services:
+  api:
+    build: .
+    container_name: tareas_api
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./instance:/app/instance
+    environment:
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-secret-key-cambiar-en-produccion}
+      - JWT_EXPIRES_MINUTES=${JWT_EXPIRES_MINUTES:-60}
+    restart: unless-stopped
